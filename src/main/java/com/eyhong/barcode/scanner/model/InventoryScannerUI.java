@@ -1,9 +1,9 @@
-package com.eyhong.barcode.Scanner.model;
+package com.eyhong.barcode.scanner.model;
 
-import com.eyhong.barcode.Scanner.config.ScannerConfig;
-import com.eyhong.barcode.Scanner.entity.Item;
-import com.eyhong.barcode.Scanner.exception.NoDataFoundException;
-import com.eyhong.barcode.Scanner.service.InventoryScannerService;
+import com.eyhong.barcode.scanner.config.ScannerConfig;
+import com.eyhong.barcode.scanner.entity.Item;
+import com.eyhong.barcode.scanner.exception.NoDataFoundException;
+import com.eyhong.barcode.scanner.service.InventoryScannerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

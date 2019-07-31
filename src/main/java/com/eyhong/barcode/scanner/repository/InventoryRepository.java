@@ -1,6 +1,6 @@
-package com.eyhong.barcode.Scanner.repository;
+package com.eyhong.barcode.scanner.repository;
 
-import com.eyhong.barcode.Scanner.entity.Item;
+import com.eyhong.barcode.scanner.entity.Item;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;
