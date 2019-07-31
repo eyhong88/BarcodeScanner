@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import javax.swing.*;
 import java.awt.*;
 
-
 @Component
 public class InventoryScannerUI {
 
@@ -19,15 +18,12 @@ public class InventoryScannerUI {
     @Autowired
     private ScannerConfig config;
 
-    /**
-     *
-     */
     public void displayUI(){
         createFrame();
     }
 
     /**
-     *
+     * This method creates the SWING-based UI making use of a {@link GridBagLayout}.
      */
     private void createFrame() {
         final JFrame frame = new JFrame(config.getTitleName());
@@ -66,8 +62,9 @@ public class InventoryScannerUI {
     }
 
     /**
+     * A helper {@link ItemLabel} is populated for cleanliness.
      *
-     * @return
+     * @return {@link ItemLabel}
      */
     private ItemLabel createItemLabel() {
         final JLabel priceText = new JLabel("", SwingConstants.CENTER);
@@ -85,8 +82,11 @@ public class InventoryScannerUI {
     }
 
     /**
+     * Textbox for barcode input is created.
+     * Barcode scanners input data ending with a new-line character ("Enter").
+     * There is an actionlistener that is waiting for the "Enter".
      *
-     * @param itemLabel
+     * @param itemLabel {@link ItemLabel}
      */
     private JPanel createBarcodePrompter(ItemLabel itemLabel) {
         final JLabel barcodeLbl = new JLabel(config.getBarcodeLabel());
