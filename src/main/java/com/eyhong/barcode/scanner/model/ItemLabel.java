@@ -1,4 +1,4 @@
-package com.eyhong.barcode.Scanner.model;
+package com.eyhong.barcode.scanner.model;
 
 import lombok.Builder;
 import lombok.Getter;

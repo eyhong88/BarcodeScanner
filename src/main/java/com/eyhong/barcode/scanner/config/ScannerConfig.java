@@ -1,4 +1,4 @@
-package com.eyhong.barcode.Scanner.config;
+package com.eyhong.barcode.scanner.config;
 
 import lombok.Getter;
 import lombok.Setter;

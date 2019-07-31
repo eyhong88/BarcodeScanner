@@ -1,4 +1,4 @@
-package com.eyhong.barcode.Scanner;
+package com.eyhong.barcode.scanner;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,6 +1,6 @@
-package com.eyhong.barcode.Scanner;
+package com.eyhong.barcode.scanner;
 
-import com.eyhong.barcode.Scanner.model.InventoryScannerUI;
+import com.eyhong.barcode.scanner.model.InventoryScannerUI;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
