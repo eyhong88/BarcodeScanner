@@ -10,8 +10,15 @@ import org.springframework.stereotype.Service;
 public class InventoryScannerServiceImpl implements InventoryScannerService {
 
     @Autowired
-    InventoryRepository repo;
+    private InventoryRepository repo;
 
+    /**
+     * Find if barcode exists in our persistence layer.
+     *
+     * @param barcode {@link String}
+     * @return {@link Item}
+     * @throws NoDataFoundException
+     */
     @Override
     public Item scan(String barcode) throws NoDataFoundException {
         return repo.findByBarcode(barcode).orElseThrow(() -> new NoDataFoundException("Barcode could not be found."));
