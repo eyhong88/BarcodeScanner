@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Collections;
 
 @Component
 public class InventoryScannerUI {
@@ -98,32 +101,46 @@ public class InventoryScannerUI {
         barcodePanel.add(barcodeLbl);
         barcodePanel.add(barcodeTextBox);
 
-        barcodeTextBox.addActionListener(x -> {
-            System.out.println("Inside Action Listener : " + x.getActionCommand());
-            final JLabel priceText = itemLabel.getPrice();
-            final JLabel barcodeText = itemLabel.getBarcode();
-            final JLabel brandText = itemLabel.getBrand();
+        barcodeTextBox.setFocusTraversalKeys(
+                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 
-            try {
-                Item item = scannerService.scan(barcodeTextBox.getText());
-                priceText.setForeground(Color.GREEN);
-                priceText.setText("$" + item.getPrice());
-//                barcodeText.setForeground(Color.BLACK);
-//                barcodeText.setText(item.getBarcode());
-                brandText.setForeground(Color.BLACK);
-                brandText.setText(item.getName());
+        //TODO Make this into its own method/class.
+        KeyListener keyListener = new KeyListener(){
 
-                barcodeTextBox.setText("");
-            } catch (NoDataFoundException e) {
-                System.out.println("Do something. " + e.getMessage());
-                priceText.setForeground(Color.RED);
-                priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
-                priceText.setText(e.getMessage());
-                brandText.setText("");
-                barcodeTextBox.setText("");
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                if(ke.getKeyCode() == KeyEvent.VK_TAB){
+                    final JLabel priceText = itemLabel.getPrice();
+                    final JLabel barcodeText = itemLabel.getBarcode();
+                    final JLabel brandText = itemLabel.getBrand();
+                    try {
+                        Item item = scannerService.scan(barcodeTextBox.getText());
+                        priceText.setForeground(Color.GREEN);
+                        priceText.setText("$" + item.getPrice());
+//                        barcodeText.setForeground(Color.BLACK);
+//                        barcodeText.setText(item.getBarcode());
+                        brandText.setForeground(Color.BLACK);
+                        brandText.setText(item.getName());
+                        barcodeTextBox.setText("");
+                    } catch (NoDataFoundException e) {
+                        System.out.println("Do something. " + e.getMessage());
+                        priceText.setForeground(Color.RED);
+                        priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
+                        priceText.setText(e.getMessage());
+                        brandText.setText("");
+                        barcodeTextBox.setText("");
+                    }
+                }
             }
-        });
 
+            @Override
+            public void keyReleased(KeyEvent e) {}
+        };
+
+        barcodeTextBox.addKeyListener(keyListener);
         return barcodePanel;
     }
 }
