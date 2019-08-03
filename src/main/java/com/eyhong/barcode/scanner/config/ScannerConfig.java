@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 public class ScannerConfig {
     @Value("${scanner.title.name}")
     private String titleName;
+    @Value("${scanner.inventory.title.name}")
+    private String inventoryTitleName;
     @Value("${scanner.barcode.label}")
     private String barcodeLabel;
     @Value("${scanner.returned.barcode.label}")

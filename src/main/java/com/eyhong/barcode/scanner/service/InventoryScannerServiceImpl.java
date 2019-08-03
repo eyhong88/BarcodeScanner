@@ -21,6 +21,7 @@ public class InventoryScannerServiceImpl implements InventoryScannerService {
      */
     @Override
     public Item scan(String barcode) throws NoDataFoundException {
-        return repo.findByBarcode(barcode).orElseThrow(() -> new NoDataFoundException("Barcode could not be found."));
+        return repo.findByBarcode(barcode).orElseThrow(() -> new NoDataFoundException("Item could not be found for barcode: " + barcode));
     }
+
 }

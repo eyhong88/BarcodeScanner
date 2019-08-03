@@ -1,17 +1,24 @@
 package com.eyhong.barcode.scanner.model;
 
+import com.eyhong.barcode.scanner.ApplicationEnum;
 import com.eyhong.barcode.scanner.config.ScannerConfig;
 import com.eyhong.barcode.scanner.entity.Item;
+import com.eyhong.barcode.scanner.entity.ItemLabel;
 import com.eyhong.barcode.scanner.exception.NoDataFoundException;
 import com.eyhong.barcode.scanner.service.InventoryScannerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.util.Collections;
 
 @Component
-public class InventoryScannerUI {
+@Slf4j
+public class InventoryScannerPrice implements InventoryScanner {
 
     @Autowired
     private InventoryScannerService scannerService;
@@ -25,7 +32,10 @@ public class InventoryScannerUI {
     /**
      * This method creates the SWING-based UI making use of a {@link GridBagLayout}.
      */
-    private void createFrame() {
+    public void createFrame() {
+
+        log.debug("Beginning of InventoryScannerPrice.createFrame.");
+
         final JFrame frame = new JFrame(config.getTitleName());
 
         ItemLabel itemLabel = createItemLabel();
@@ -98,32 +108,50 @@ public class InventoryScannerUI {
         barcodePanel.add(barcodeLbl);
         barcodePanel.add(barcodeTextBox);
 
-        barcodeTextBox.addActionListener(x -> {
-            System.out.println("Inside Action Listener : " + x.getActionCommand());
-            final JLabel priceText = itemLabel.getPrice();
-            final JLabel barcodeText = itemLabel.getBarcode();
-            final JLabel brandText = itemLabel.getBrand();
+        barcodeTextBox.setFocusTraversalKeys(
+                KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 
-            try {
-                Item item = scannerService.scan(barcodeTextBox.getText());
-                priceText.setForeground(Color.GREEN);
-                priceText.setText("$" + item.getPrice());
-//                barcodeText.setForeground(Color.BLACK);
-//                barcodeText.setText(item.getBarcode());
-                brandText.setForeground(Color.BLACK);
-                brandText.setText(item.getName());
+        //TODO Make this into its own method/class.
+        KeyListener keyListener = new KeyListener(){
 
-                barcodeTextBox.setText("");
-            } catch (NoDataFoundException e) {
-                System.out.println("Do something. " + e.getMessage());
-                priceText.setForeground(Color.RED);
-                priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
-                priceText.setText(e.getMessage());
-                brandText.setText("");
-                barcodeTextBox.setText("");
+            @Override
+            public void keyTyped(KeyEvent e) {}
+
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                if(ke.getKeyCode() == KeyEvent.VK_TAB){
+                    log.debug("Inside KeyEvent TAB.");
+
+                    final JLabel priceText = itemLabel.getPrice();
+                    final JLabel brandText = itemLabel.getBrand();
+                    try {
+                        Item item = scannerService.scan(barcodeTextBox.getText());
+                        priceText.setForeground(Color.GREEN);
+                        priceText.setText("$" + item.getPrice());
+                        brandText.setForeground(Color.BLACK);
+                        brandText.setText(item.getName());
+                        barcodeTextBox.setText("");
+                    } catch (NoDataFoundException e) {
+
+                        log.error(e.getMessage());
+                        priceText.setForeground(Color.RED);
+                        priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
+                        priceText.setText(e.getMessage());
+                        brandText.setText("");
+                        barcodeTextBox.setText("");
+                    }
+                }
             }
-        });
 
+            @Override
+            public void keyReleased(KeyEvent e) {}
+        };
+
+        barcodeTextBox.addKeyListener(keyListener);
         return barcodePanel;
+    }
+
+    public ApplicationEnum getType(){
+        return ApplicationEnum.SCAN;
     }
 }
