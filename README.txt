@@ -9,12 +9,12 @@
 
 
 The program is designed to accept text input from a Barcode Scanner and will validate it against data stored in the Database.
-The intent of this program is to display prices for a given barcode existing in the database.
+This program displays prices for a given barcode existing in the database and also has the ability to insert/update inventory data.
 
-There will be a follow-up program that will be used as inventory management.
-This will allow for a user to do CRUD (CREATE/READ/UPDATE/DELETE) operations against the inventory data stored in the Database.
-This follow-up program can be used to pre-seed the database, if manually inserting records is not possible.
+To use the price check application, you must run the executable jar  with "SCAN" as an argument.
+To use the inventory application, you must run the executable jar with "ADD" as an argument.
 
 Required Environment Variables: DB_USERNAME, DB_PASSWORD
+Required Argument: SCAN or ADD
 
 Assumptions: Program uses MySQL as the datasource.
