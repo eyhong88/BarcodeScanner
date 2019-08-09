@@ -15,4 +15,5 @@ public class ItemLabel {
     JLabel barcode;
     JLabel returnedBarcodeLbl;
     JLabel returnedBrandLbl;
+    JLabel comment;
 }

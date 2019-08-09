@@ -4,6 +4,10 @@ CREATE TABLE inventory.item
  barcode	varchar(100),
  quantity	int,
  price		decimal(12,2),
+ comment	varchar(100),
  PRIMARY KEY (item_id)
 );
+
 CREATE UNIQUE INDEX ui_item_barcode ON item(barcode);
+
+ALTER TABLE item ADD COLUMN comment varchar(100);
