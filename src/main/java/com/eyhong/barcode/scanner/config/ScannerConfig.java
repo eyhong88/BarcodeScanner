@@ -31,6 +31,8 @@ public class ScannerConfig {
     private int barcodeFontSize;
     @Value("${scanner.brand.font.size}")
     private int brandFontSize;
+    @Value("${scanner.comment.font.size}")
+    private int commentFontSize;
 
 }
 

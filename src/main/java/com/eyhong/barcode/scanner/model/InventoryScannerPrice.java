@@ -65,6 +65,11 @@ public class InventoryScannerPrice implements InventoryScanner {
         c.gridy = 3;
         panel.add(itemLabel.getPrice(), c);
 
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 4;
+        panel.add(itemLabel.getComment(), c);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(config.getFrameWidth(), config.getFrameHeight());
         frame.getContentPane().add(panel);
@@ -83,11 +88,14 @@ public class InventoryScannerPrice implements InventoryScanner {
         brandText.setFont(new Font(brandText.getFont().getFontName(), Font.BOLD, config.getBrandFontSize()));
         final JLabel barcodeText = new JLabel("", SwingConstants.CENTER);
         barcodeText.setFont(new Font(barcodeText.getFont().getFontName(), Font.BOLD, config.getBarcodeFontSize()));
+        final JLabel commentText = new JLabel("", SwingConstants.CENTER);
+        commentText.setFont(new Font(commentText.getFont().getFontName(), Font.BOLD, config.getCommentFontSize()));
 
         return ItemLabel.builder()
                 .price(priceText)
                 .barcode(barcodeText)
                 .brand(brandText)
+                .comment(commentText)
                 .build();
     }
 
@@ -124,12 +132,17 @@ public class InventoryScannerPrice implements InventoryScanner {
 
                     final JLabel priceText = itemLabel.getPrice();
                     final JLabel brandText = itemLabel.getBrand();
+                    final JLabel commentText = itemLabel.getComment();
+
                     try {
                         Item item = scannerService.scan(barcodeTextBox.getText());
                         priceText.setForeground(Color.GREEN);
                         priceText.setText("$" + item.getPrice());
                         brandText.setForeground(Color.BLACK);
                         brandText.setText(item.getName());
+                        commentText.setForeground(Color.GREEN);
+                        commentText.setText(item.getComment());
+
                         barcodeTextBox.setText("");
                     } catch (NoDataFoundException e) {
 
@@ -138,6 +151,8 @@ public class InventoryScannerPrice implements InventoryScanner {
                         priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
                         priceText.setText(e.getMessage());
                         brandText.setText("");
+                        commentText.setText("");
+
                         barcodeTextBox.setText("");
                     }
                 }
