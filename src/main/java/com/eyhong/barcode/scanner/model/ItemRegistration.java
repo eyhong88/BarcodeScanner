@@ -16,8 +16,8 @@ public class ItemRegistration extends JFrame implements ActionListener {
     @Autowired
     InventoryRepository repo;
 
-    private JLabel brandLabel, barcodeLabel, priceLabel, quantityLabel;
-    private JTextField brandText, barcodeText, priceText, quantityText;
+    private JLabel brandLabel, barcodeLabel, priceLabel, quantityLabel, commentLabel;
+    private JTextField brandText, barcodeText, priceText, quantityText, commentText;
     private JButton submit, cancel;
     private Item item;
 
@@ -32,6 +32,7 @@ public class ItemRegistration extends JFrame implements ActionListener {
         barcodeLabel = new JLabel("Barcode: ", JLabel.TRAILING);
         priceLabel = new JLabel("Price: ", JLabel.TRAILING);
         quantityLabel = new JLabel("Quantity: ", JLabel.TRAILING);
+        commentLabel = new JLabel("Comment: ", JLabel.TRAILING);
 
         brandText = new JTextField();
         brandLabel.setLabelFor(brandText);
@@ -53,6 +54,11 @@ public class ItemRegistration extends JFrame implements ActionListener {
         p.add(quantityLabel);
         p.add(quantityText);
 
+        commentText = new JTextField();
+        commentLabel.setLabelFor(commentText);
+        p.add(commentLabel);
+        p.add(commentText);
+
         submit = new JButton("Submit");
         cancel = new JButton("Cancel");
         submit.addActionListener(this);
@@ -62,10 +68,10 @@ public class ItemRegistration extends JFrame implements ActionListener {
         p.add(cancel);
 
         // Set the data in the text fields if it exists.
-        setExistingItemData(brandText, barcodeText, priceText, quantityText);
+        setExistingItemData(brandText, barcodeText, priceText, quantityText, commentText);
 
         SpringUtilities.makeCompactGrid(p,
-                5, 2, //rows, cols
+                6, 2, //rows, cols
                 20, 20,        //initX, initY
                 20, 20);       //xPad, yPad
 
@@ -90,12 +96,14 @@ public class ItemRegistration extends JFrame implements ActionListener {
     private void setExistingItemData(final JTextField brandText,
                                      final JTextField barcodeText,
                                      final JTextField priceText,
-                                     final JTextField quantityText) {
+                                     final JTextField quantityText,
+                                     final JTextField commentText) {
 
         if(null != item.getName() && null != item.getPrice()){
             brandText.setText(item.getName());
             priceText.setText(String.valueOf(item.getPrice()));
             quantityText.setText(String.valueOf(item.getQuantity()));
+            commentText.setText(item.getComment());
         }
 
         //Barcode should always be present.
@@ -107,19 +115,23 @@ public class ItemRegistration extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         if(e.getSource() == submit) {
+            final int quantity = quantityText.getText().isEmpty() ? 0 :  Integer.valueOf(quantityText.getText());
+
             if(null == item.getName()){
                 item = Item.builder()
                         .name(brandText.getText())
                         .barcode(barcodeText.getText())
                         .price(Double.valueOf(priceText.getText()))
-                        .quantity(Integer.valueOf(quantityText.getText()))
+                        .quantity(quantity)
+                        .comment(commentText.getText())
                         .build();
             } else {
                 // We may be doing unnecessary overrides here..
                 item.setName(brandText.getText());
                 item.setBarcode(barcodeText.getText());
                 item.setPrice(Double.valueOf(priceText.getText()));
-                item.setQuantity(Integer.valueOf(quantityText.getText()));
+                item.setQuantity(quantity);
+                item.setComment(commentText.getText());
             }
 
             repo.save(item);
