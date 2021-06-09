@@ -14,7 +14,7 @@ import java.awt.event.ActionListener;
 @Slf4j
 public class ItemRegistration extends JFrame implements ActionListener {
     @Autowired
-    InventoryRepository repo;
+    private InventoryRepository repo;
 
     private JLabel brandLabel, barcodeLabel, priceLabel, quantityLabel, commentLabel;
     private JTextField brandText, barcodeText, priceText, quantityText, commentText;
@@ -143,4 +143,5 @@ public class ItemRegistration extends JFrame implements ActionListener {
         }
 
     }
+
 }

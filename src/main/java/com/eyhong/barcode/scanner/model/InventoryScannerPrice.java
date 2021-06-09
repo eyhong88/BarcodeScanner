@@ -24,6 +24,8 @@ public class InventoryScannerPrice implements InventoryScanner {
     private InventoryScannerService scannerService;
     @Autowired
     private ScannerConfig config;
+    @Autowired
+    private AddPopupGUI popup;
 
     public void displayUI(){
         createFrame();
@@ -101,8 +103,8 @@ public class InventoryScannerPrice implements InventoryScanner {
 
     /**
      * Textbox for barcode input is created.
-     * Barcode scanners input data ending with a new-line character ("Enter").
-     * There is an actionlistener that is waiting for the "Enter".
+     * Barcode scanners input data ending with a TAB character ("TAB").
+     * There is an actionlistener that is waiting for the "TAB".
      *
      * @param itemLabel {@link ItemLabel}
      */
@@ -136,17 +138,12 @@ public class InventoryScannerPrice implements InventoryScanner {
 
                     try {
                         Item item = scannerService.scan(barcodeTextBox.getText());
-                        priceText.setForeground(Color.GREEN);
-                        priceText.setText("$" + item.getPrice());
-                        brandText.setForeground(Color.BLACK);
-                        brandText.setText(item.getName());
-                        commentText.setForeground(Color.GREEN);
-                        commentText.setText(item.getComment());
+                        setItemDetails(priceText, brandText, commentText, item);
 
                         barcodeTextBox.setText("");
                     } catch (NoDataFoundException e) {
-
                         log.error(e.getMessage());
+                        promptToAdd(Item.builder().barcode(barcodeTextBox.getText()).build());
                         priceText.setForeground(Color.RED);
                         priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
                         priceText.setText(e.getMessage());
@@ -154,6 +151,7 @@ public class InventoryScannerPrice implements InventoryScanner {
                         commentText.setText("");
 
                         barcodeTextBox.setText("");
+
                     }
                 }
             }
@@ -163,7 +161,21 @@ public class InventoryScannerPrice implements InventoryScanner {
         };
 
         barcodeTextBox.addKeyListener(keyListener);
+
         return barcodePanel;
+    }
+
+    private void promptToAdd(Item item) {
+        popup.displayUI(item);
+    }
+
+    private void setItemDetails(JLabel priceText, JLabel brandText, JLabel commentText, Item item) {
+        priceText.setForeground(Color.BLACK);
+        priceText.setText("$" + item.getPrice());
+        brandText.setForeground(Color.BLACK);
+        brandText.setText(item.getName());
+        commentText.setForeground(Color.BLACK);
+        commentText.setText(item.getComment());
     }
 
     public ApplicationEnum getType(){

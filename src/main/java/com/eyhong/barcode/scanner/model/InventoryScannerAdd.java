@@ -37,7 +37,7 @@ public class InventoryScannerAdd implements InventoryScanner {
     public void createFrame() {
         log.debug("Beginning of InventoryScannerAdd.createFrame.");
 
-        final JFrame frame = new JFrame(config.getTitleName());
+        final JFrame frame = new JFrame(config.getInventoryTitleName());
 
         JPanel barcodePanel = createBarcodePrompter();
 
