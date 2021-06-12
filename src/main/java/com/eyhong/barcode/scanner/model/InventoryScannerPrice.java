@@ -8,12 +8,16 @@ import com.eyhong.barcode.scanner.exception.NoDataFoundException;
 import com.eyhong.barcode.scanner.service.InventoryScannerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Collections;
 
 @Component
@@ -24,6 +28,10 @@ public class InventoryScannerPrice implements InventoryScanner {
     private InventoryScannerService scannerService;
     @Autowired
     private ScannerConfig config;
+    @Autowired
+    private AddPopupGUI popup;
+    @Autowired
+    private MainScreenGUI mainScreenGUI;
 
     public void displayUI(){
         createFrame();
@@ -42,6 +50,10 @@ public class InventoryScannerPrice implements InventoryScanner {
         JPanel barcodePanel = createBarcodePrompter(itemLabel);
 
         final JPanel panel = new JPanel();
+
+        barcodePanel.setBackground(Color.WHITE);
+        panel.setBackground(Color.WHITE);
+
         panel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -70,9 +82,15 @@ public class InventoryScannerPrice implements InventoryScanner {
         c.gridy = 4;
         panel.add(itemLabel.getComment(), c);
 
+        JLabel homeIcon = createHomeIcon();
+        InventoryMouseListener homeIconClickable = new InventoryMouseListener(frame, homeIcon);
+        homeIcon.addMouseListener(homeIconClickable);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(config.getFrameWidth(), config.getFrameHeight());
-        frame.getContentPane().add(panel);
+        frame.add(homeIcon);
+        frame.add(panel);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
     }
 
@@ -101,8 +119,8 @@ public class InventoryScannerPrice implements InventoryScanner {
 
     /**
      * Textbox for barcode input is created.
-     * Barcode scanners input data ending with a new-line character ("Enter").
-     * There is an actionlistener that is waiting for the "Enter".
+     * Barcode scanners input data ending with a TAB character ("TAB").
+     * There is an actionlistener that is waiting for the "TAB".
      *
      * @param itemLabel {@link ItemLabel}
      */
@@ -119,9 +137,37 @@ public class InventoryScannerPrice implements InventoryScanner {
         barcodeTextBox.setFocusTraversalKeys(
                 KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 
-        //TODO Make this into its own method/class.
-        KeyListener keyListener = new KeyListener(){
+        KeyListener keyListener = new InventoryKeyListener(itemLabel, barcodeTextBox);
+        barcodeTextBox.addKeyListener(keyListener);
 
+        return barcodePanel;
+    }
+
+    private void promptToAdd(Item item) {
+        popup.displayUI(item);
+    }
+
+    private void setItemDetails(JLabel priceText, JLabel brandText, JLabel commentText, Item item) {
+        priceText.setForeground(Color.BLACK);
+        priceText.setText("$" + String.format(" %.2f", item.getPrice()));
+        brandText.setForeground(Color.BLACK);
+        brandText.setText(item.getName());
+        commentText.setForeground(Color.BLACK);
+        commentText.setText(item.getComment());
+    }
+
+    public ApplicationEnum getType(){
+        return ApplicationEnum.SCAN;
+    }
+
+    class InventoryKeyListener implements KeyListener {
+        ItemLabel itemLabel;
+        JTextField barcodeTextBox;
+
+        public InventoryKeyListener(ItemLabel itemLabel, JTextField barcodeTextBox){
+            this.itemLabel = itemLabel;
+            this.barcodeTextBox = barcodeTextBox;
+        }
             @Override
             public void keyTyped(KeyEvent e) {}
 
@@ -136,17 +182,12 @@ public class InventoryScannerPrice implements InventoryScanner {
 
                     try {
                         Item item = scannerService.scan(barcodeTextBox.getText());
-                        priceText.setForeground(Color.GREEN);
-                        priceText.setText("$" + item.getPrice());
-                        brandText.setForeground(Color.BLACK);
-                        brandText.setText(item.getName());
-                        commentText.setForeground(Color.GREEN);
-                        commentText.setText(item.getComment());
+                        setItemDetails(priceText, brandText, commentText, item);
 
                         barcodeTextBox.setText("");
                     } catch (NoDataFoundException e) {
-
                         log.error(e.getMessage());
+                        promptToAdd(Item.builder().barcode(barcodeTextBox.getText()).build());
                         priceText.setForeground(Color.RED);
                         priceText.setFont(new Font(priceText.getFont().getFontName(), Font.BOLD, 32));
                         priceText.setText(e.getMessage());
@@ -154,19 +195,55 @@ public class InventoryScannerPrice implements InventoryScanner {
                         commentText.setText("");
 
                         barcodeTextBox.setText("");
+
                     }
                 }
             }
 
             @Override
             public void keyReleased(KeyEvent e) {}
-        };
-
-        barcodeTextBox.addKeyListener(keyListener);
-        return barcodePanel;
     }
 
-    public ApplicationEnum getType(){
-        return ApplicationEnum.SCAN;
+    /**
+     * Home Icon mouselistener
+     */
+    class InventoryMouseListener implements MouseListener {
+
+        private JLabel homeIcon;
+        private JFrame currFrame;
+
+        public InventoryMouseListener(JFrame currFrame, JLabel homeIcon) {
+            this.currFrame = currFrame;
+            this.homeIcon = homeIcon;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent mouseEvent) {}
+
+        @Override
+        public void mousePressed(MouseEvent mouseEvent) {}
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if(onButton(e, homeIcon)) {
+                mainScreenGUI.displayUI();
+                currFrame.dispose();
+            }
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent mouseEvent) {
+            homeIcon.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        }
+
+        @Override
+        public void mouseExited(MouseEvent mouseEvent) {
+            homeIcon.setBorder(null);
+        }
+
+        private boolean onButton(MouseEvent e, JLabel button) {
+            return e.getPoint().getX() >= 0 && e.getPoint().getY() >= 0 &&
+                    e.getPoint().getX() <= button.getWidth() && e.getPoint().getY() <= button.getHeight();
+        }
     }
 }
