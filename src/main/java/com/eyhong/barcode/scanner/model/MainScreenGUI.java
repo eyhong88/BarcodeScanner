@@ -2,6 +2,7 @@ package com.eyhong.barcode.scanner.model;
 
 import com.eyhong.barcode.scanner.ApplicationEnum;
 import com.eyhong.barcode.scanner.factory.InventoryScannerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -9,6 +10,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 @Component
+@Lazy
 public class MainScreenGUI extends JFrame {
     private JLabel mainTitle;
     private JLabel priceScanButton;

@@ -15,8 +15,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class ScannerApplication implements ApplicationRunner {
 
 	@Autowired
-	MainScreenGUI mainScreenGUI;
-
+	private MainScreenGUI mainScreenGUI;
 
 	public static void main(String[] args) {
 		SpringApplicationBuilder builder = new SpringApplicationBuilder(ScannerApplication.class);

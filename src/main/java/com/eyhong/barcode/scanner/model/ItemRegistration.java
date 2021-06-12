@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -23,6 +24,7 @@ public class ItemRegistration extends JFrame implements ActionListener {
 
     public void itemRegistration(Item item) {
         log.debug("Beginning of ItemRegistration.itemRegistration for item= {}", item.getBarcode());
+        setTitle("Add/Modify Item");
         this.item = item;
 
         //Create and populate the panel.
@@ -78,6 +80,8 @@ public class ItemRegistration extends JFrame implements ActionListener {
         //Set up the content pane.
         p.setOpaque(true);  //content panes must be opaque
         setContentPane(p);
+        setPreferredSize(new Dimension(300, 300));
+        setLocationRelativeTo(null);
 
         //Display the window.
         pack();
