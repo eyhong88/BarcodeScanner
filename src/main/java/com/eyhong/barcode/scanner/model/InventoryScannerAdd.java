@@ -3,17 +3,20 @@ package com.eyhong.barcode.scanner.model;
 import com.eyhong.barcode.scanner.ApplicationEnum;
 import com.eyhong.barcode.scanner.config.ScannerConfig;
 import com.eyhong.barcode.scanner.entity.Item;
-import com.eyhong.barcode.scanner.entity.ItemLabel;
 import com.eyhong.barcode.scanner.exception.NoDataFoundException;
 import com.eyhong.barcode.scanner.service.InventoryScannerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Collections;
 
 @Component
@@ -26,6 +29,8 @@ public class InventoryScannerAdd implements InventoryScanner {
     private ItemRegistration itemScreen;
     @Autowired
     private ScannerConfig config;
+    @Autowired
+    private MainScreenGUI mainScreenGUI;
 
     public void displayUI(){
         createFrame();
@@ -37,11 +42,15 @@ public class InventoryScannerAdd implements InventoryScanner {
     public void createFrame() {
         log.debug("Beginning of InventoryScannerAdd.createFrame.");
 
-        final JFrame frame = new JFrame(config.getTitleName());
+        final JFrame frame = new JFrame(config.getInventoryTitleName());
 
         JPanel barcodePanel = createBarcodePrompter();
 
         final JPanel panel = new JPanel();
+
+        barcodePanel.setBackground(Color.WHITE);
+        panel.setBackground(Color.WHITE);
+
         panel.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -50,9 +59,15 @@ public class InventoryScannerAdd implements InventoryScanner {
         c.gridy = 0;
         panel.add(barcodePanel, c);
 
+        JLabel homeIcon = createHomeIcon();
+        InventoryMouseListener homeIconClickable = new InventoryMouseListener(frame, homeIcon);
+        homeIcon.addMouseListener(homeIconClickable);
+
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(config.getFrameWidth(), config.getFrameHeight());
-        frame.getContentPane().add(panel);
+        frame.add(homeIcon);
+        frame.add(panel);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setVisible(true);
     }
 
@@ -75,33 +90,7 @@ public class InventoryScannerAdd implements InventoryScanner {
         barcodeTextBox.setFocusTraversalKeys(
                 KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, Collections.EMPTY_SET);
 
-        //TODO Make this into its own method/class.
-        KeyListener keyListener = new KeyListener(){
-
-            @Override
-            public void keyTyped(KeyEvent e) {}
-
-            @Override
-            public void keyPressed(KeyEvent ke) {
-                if(ke.getKeyCode() == KeyEvent.VK_TAB){
-                    Item item = Item.builder().barcode(barcodeTextBox.getText()).build();
-                    try {
-                        item = scannerService.scan(barcodeTextBox.getText());
-
-                    } catch (NoDataFoundException e) {
-                        log.debug("No item found. May need to insert new item. {}", e.getMessage());
-                    }
-                    log.info("Processing barcode#= {}", item.getBarcode());
-
-                    // If the item exists, we pass it in, otherwise we pass in null.
-                    itemScreen.itemRegistration(item);
-                    barcodeTextBox.setText("");
-                }
-            }
-
-            @Override
-            public void keyReleased(KeyEvent e) {}
-        };
+        KeyListener keyListener = new InventoryKeyListener(barcodeTextBox);
 
         barcodeTextBox.addKeyListener(keyListener);
         return barcodePanel;
@@ -110,4 +99,81 @@ public class InventoryScannerAdd implements InventoryScanner {
     public ApplicationEnum getType(){
         return ApplicationEnum.ADD;
     }
+
+    class InventoryKeyListener implements KeyListener {
+        JTextField barcodeTextBox;
+
+        public InventoryKeyListener(JTextField barcodeTextBox){
+            this.barcodeTextBox = barcodeTextBox;
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {}
+
+        @Override
+        public void keyPressed(KeyEvent ke) {
+            if(ke.getKeyCode() == KeyEvent.VK_TAB){
+                Item item = Item.builder().barcode(barcodeTextBox.getText()).build();
+                try {
+                    item = scannerService.scan(barcodeTextBox.getText());
+
+                } catch (NoDataFoundException e) {
+                    log.debug("No item found. May need to insert new item. {}", e.getMessage());
+                }
+                log.info("Processing barcode#= {}", item.getBarcode());
+
+                // If the item exists, we pass it in, otherwise we pass in null.
+                itemScreen.itemRegistration(item);
+                barcodeTextBox.setText("");
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {}
+    }
+
+
+    /**
+     * Home Icon mouselistener
+     */
+    class InventoryMouseListener implements MouseListener {
+
+        private JLabel homeIcon;
+        private JFrame currFrame;
+
+        public InventoryMouseListener(JFrame currFrame, JLabel homeIcon) {
+            this.currFrame = currFrame;
+            this.homeIcon = homeIcon;
+        }
+
+        @Override
+        public void mouseClicked(MouseEvent mouseEvent) {}
+
+        @Override
+        public void mousePressed(MouseEvent mouseEvent) {}
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            if(onButton(e, homeIcon)) {
+                mainScreenGUI.displayUI();
+                currFrame.dispose();
+            }
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent mouseEvent) {
+            homeIcon.setBorder(BorderFactory.createBevelBorder(BevelBorder.RAISED));
+        }
+
+        @Override
+        public void mouseExited(MouseEvent mouseEvent) {
+            homeIcon.setBorder(null);
+        }
+
+        private boolean onButton(MouseEvent e, JLabel button) {
+            return e.getPoint().getX() >= 0 && e.getPoint().getY() >= 0 &&
+                    e.getPoint().getX() <= button.getWidth() && e.getPoint().getY() <= button.getHeight();
+        }
+    }
+
 }
