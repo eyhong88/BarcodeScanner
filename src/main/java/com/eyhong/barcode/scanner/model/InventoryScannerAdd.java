@@ -7,7 +7,6 @@ import com.eyhong.barcode.scanner.exception.NoDataFoundException;
 import com.eyhong.barcode.scanner.service.InventoryScannerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -23,23 +22,25 @@ import java.util.Collections;
 @Slf4j
 public class InventoryScannerAdd implements InventoryScanner {
 
-    @Autowired
     private InventoryScannerService scannerService;
-    @Autowired
     private ItemRegistration itemScreen;
-    @Autowired
     private ScannerConfig config;
-    @Autowired
     private MainScreenGUI mainScreenGUI;
 
-    public void displayUI(){
-        createFrame();
+    @Autowired
+    public InventoryScannerAdd(InventoryScannerService scannerService, ItemRegistration itemScreen,
+                                ScannerConfig scannerConfig, MainScreenGUI mainScreenGUI){
+        this.scannerService = scannerService;
+        this.itemScreen = itemScreen;
+        this.config = scannerConfig;
+        this.mainScreenGUI = mainScreenGUI;
     }
 
     /**
      * This method creates the SWING-based UI making use of a {@link GridBagLayout}.
      */
-    public void createFrame() {
+    public void displayUI(){
+
         log.debug("Beginning of InventoryScannerAdd.createFrame.");
 
         final JFrame frame = new JFrame(config.getInventoryTitleName());

@@ -8,7 +8,6 @@ import com.eyhong.barcode.scanner.exception.NoDataFoundException;
 import com.eyhong.barcode.scanner.service.InventoryScannerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
@@ -24,23 +23,26 @@ import java.util.Collections;
 @Slf4j
 public class InventoryScannerPrice implements InventoryScanner {
 
-    @Autowired
     private InventoryScannerService scannerService;
-    @Autowired
     private ScannerConfig config;
-    @Autowired
     private AddPopupGUI popup;
-    @Autowired
     private MainScreenGUI mainScreenGUI;
 
-    public void displayUI(){
-        createFrame();
+    @Autowired
+    public InventoryScannerPrice(InventoryScannerService scannerService, ScannerConfig config, AddPopupGUI popup,
+                                 MainScreenGUI mainScreenGUI){
+        this.scannerService = scannerService;
+        this.config = config;
+        this.popup = popup;
+        this.mainScreenGUI = mainScreenGUI;
     }
+
 
     /**
      * This method creates the SWING-based UI making use of a {@link GridBagLayout}.
      */
-    public void createFrame() {
+    public void displayUI(){
+
 
         log.debug("Beginning of InventoryScannerPrice.createFrame.");
 
@@ -147,9 +149,16 @@ public class InventoryScannerPrice implements InventoryScanner {
         popup.displayUI(item);
     }
 
+    /**
+     * Set the details of the item that will be displayed on screen.
+     * @param priceText
+     * @param brandText
+     * @param commentText
+     * @param item
+     */
     private void setItemDetails(JLabel priceText, JLabel brandText, JLabel commentText, Item item) {
         priceText.setForeground(Color.BLACK);
-        priceText.setText("$" + String.format(" %.2f", item.getPrice()));
+        priceText.setText("$" + String.format("%.2f", item.getPrice()));
         brandText.setForeground(Color.BLACK);
         brandText.setText(item.getName());
         commentText.setForeground(Color.BLACK);
@@ -160,6 +169,9 @@ public class InventoryScannerPrice implements InventoryScanner {
         return ApplicationEnum.SCAN;
     }
 
+    /**
+     * KeyListener for the Price Scanner.
+     */
     class InventoryKeyListener implements KeyListener {
         ItemLabel itemLabel;
         JTextField barcodeTextBox;
