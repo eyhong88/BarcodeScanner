@@ -7,7 +7,6 @@ import javax.swing.*;
 public interface InventoryScanner {
 
     void displayUI();
-    void createFrame();
     ApplicationEnum getType();
 
     default JLabel createHomeIcon(){

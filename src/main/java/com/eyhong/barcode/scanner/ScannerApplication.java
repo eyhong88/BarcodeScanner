@@ -7,11 +7,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
-@ComponentScan
 @Slf4j
+@SpringBootApplication(scanBasePackages = "com.eyhong.barcode.scanner.*")
 public class ScannerApplication implements ApplicationRunner {
 
 	@Autowired
