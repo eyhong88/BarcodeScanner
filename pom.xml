@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.eyhong.barcode</groupId>
 	<artifactId>BarcodeScanner</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.3</version>
 	<name>Barcode Scanner</name>
 
 	<properties>
